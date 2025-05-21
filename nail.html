@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NailSK - Salon Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f9f5f6;
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        .service-card {
+            transition: all 0.3s ease;
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .modal {
+            transition: opacity 0.3s ease;
+        }
+        .btn-primary {
+            background-color: #f472b6;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #ec4899;
+        }
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #4b5563;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+        .tab {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .tab.active {
+            border-bottom: 2px solid #f472b6;
+            color: #f472b6;
+        }
+        .loader {
+            border-top-color: #f472b6;
+            animation: spinner 0.6s linear infinite;
+        }
+        @keyframes spinner {
+            to {transform: rotate(360deg);}
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h1 class="ml-2 text-2xl font-bold text-gray-800">NailSK</h1>
+            </div>
+            <nav>
+                <ul class="flex space-x-4">
+                    <li><a href="#" class="nav-link text-gray-600 hover:text-pink-500" data-page="home">Home</a></li>
+                    <li><a href="#" class="nav-link text-gray-600 hover:text-pink-500" data-page="services">Services</a></li>
+                    <li><a href="#" class="nav-link text-gray-600 hover:text-pink-500" data-page="booking">Book Now</a></li>
+                    <li><a href="#" class="nav-link text-gray-600 hover:text-pink-500" data-page="admin-login">Admin</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Home Page -->
+        <section id="home" class="page active">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="md:w-1/2 mb-8 md:mb-0">
+                    <h2 class="text-4xl font-bold text-gray-800 mb-4">Welcome to NailSK</h2>
+                    <p class="text-lg text-gray-600 mb-6">Your premier destination for nail care and beauty services.</p>
+                    <div class="flex space-x-4">
+                        <button class="nav-link btn-primary px-6 py-3 rounded-lg font-medium" data-page="services">View Services</button>
+                        <button class="nav-link btn-secondary px-6 py-3 rounded-lg font-medium" data-page="booking">Book Appointment</button>
+                    </div>
+                </div>
+                <div class="md:w-1/2">
+                    <div class="bg-pink-100 rounded-lg p-8 text-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mx-auto text-pink-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Scan our QR Code</h3>
+                        <p class="text-gray-600 mb-4">For quick access to our services on your mobile device</p>
+                        <div id="qrcode" class="flex justify-center"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-16">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">Our Featured Services</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="h-40 bg-pink-200 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
+                            </svg>
+                        </div>
+                        <div class="p-6">
+                            <h4 class="text-xl font-semibold text-gray-800 mb-2">Manicure</h4>
+                            <p class="text-gray-600 mb-4">Professional nail care for your hands with premium products.</p>
+                            <button class="nav-link btn-primary w-full py-2 rounded-lg font-medium" data-page="services">Learn More</button>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="h-40 bg-purple-200 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                            </svg>
+                        </div>
+                        <div class="p-6">
+                            <h4 class="text-xl font-semibold text-gray-800 mb-2">Pedicure</h4>
+                            <p class="text-gray-600 mb-4">Relaxing and rejuvenating foot treatment with massage.</p>
+                            <button class="nav-link btn-primary w-full py-2 rounded-lg font-medium" data-page="services">Learn More</button>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="h-40 bg-blue-200 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                            </svg>
+                        </div>
+                        <div class="p-6">
+                            <h4 class="text-xl font-semibold text-gray-800 mb-2">Nail Art</h4>
+                            <p class="text-gray-600 mb-4">Creative and customized designs for your nails.</p>
+                            <button class="nav-link btn-primary w-full py-2 rounded-lg font-medium" data-page="services">Learn More</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Page -->
+        <section id="services" class="page">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">Our Services</h2>
+            
+            <div class="mb-8">
+                <div class="flex overflow-x-auto space-x-4 pb-2">
+                    <div class="category-tab tab active whitespace-nowrap px-4 py-2" data-category="all">All Services</div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8" id="services-container">
+                <!-- Services will be loaded here -->
+                <div class="flex items-center justify-center p-8">
+                    <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Your Selected Services</h3>
+                <div id="selected-services" class="mb-4">
+                    <p class="text-gray-500 italic">No services selected yet.</p>
+                </div>
+                <div class="flex justify-between items-center border-t pt-4">
+                    <span class="text-lg font-semibold">Total:</span>
+                    <span class="text-xl font-bold text-pink-500" id="total-price">$0.00</span>
+                </div>
+                <div class="mt-4">
+                    <button class="nav-link btn-primary w-full py-3 rounded-lg font-medium" data-page="booking">Proceed to Booking</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Booking Page -->
+        <section id="booking" class="page">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">Book an Appointment</h2>
+            
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Selected Services</h3>
+                <div id="booking-services" class="mb-4">
+                    <p class="text-gray-500 italic">No services selected yet. Please select services first.</p>
+                </div>
+                <div class="flex justify-between items-center border-t pt-4">
+                    <span class="text-lg font-semibold">Total:</span>
+                    <span class="text-xl font-bold text-pink-500" id="booking-total-price">$0.00</span>
+                </div>
+                <div class="mt-4">
+                    <button class="nav-link btn-secondary w-full py-2 rounded-lg font-medium" data-page="services">Modify Selection</button>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Your Information</h3>
+                <form id="booking-form" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="name" class="block text-gray-700 mb-1">Full Name</label>
+                            <input type="text" id="name" name="name" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-gray-700 mb-1">Email</label>
+                            <input type="email" id="email" name="email" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="phone" class="block text-gray-700 mb-1">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300">
+                        </div>
+                        <div>
+                            <label for="date" class="block text-gray-700 mb-1">Preferred Date</label>
+                            <input type="date" id="date" name="date" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="time" class="block text-gray-700 mb-1">Preferred Time</label>
+                            <select id="time" name="time" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300">
+                                <option value="">Select a time</option>
+                                <option value="09:00">9:00 AM</option>
+                                <option value="10:00">10:00 AM</option>
+                                <option value="11:00">11:00 AM</option>
+                                <option value="12:00">12:00 PM</option>
+                                <option value="13:00">1:00 PM</option>
+                                <option value="14:00">2:00 PM</option>
+                                <option value="15:00">3:00 PM</option>
+                                <option value="16:00">4:00 PM</option>
+                                <option value="17:00">5:00 PM</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="staff" class="block text-gray-700 mb-1">Preferred Staff (Optional)</label>
+                            <select id="staff" name="staff" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300">
+                                <option value="">No preference</option>
+                                <option value="Sarah">Sarah</option>
+                                <option value="Michael">Michael</option>
+                                <option value="Jessica">Jessica</option>
+                                <option value="David">David</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="notes" class="block text-gray-700 mb-1">Special Requests (Optional)</label>
+                        <textarea id="notes" name="notes" rows="3" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"></textarea>
+                    </div>
+                    <div class="pt-4">
+                        <button type="submit" class="btn-primary w-full py-3 rounded-lg font-medium">Book Appointment</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Admin Login Page -->
+        <section id="admin-login" class="page">
+            <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Admin Login</h2>
+                <form id="login-form" class="space-y-4">
+                    <div>
+                        <label for="admin-email" class="block text-gray-700 mb-1">Email</label>
+                        <input type="email" id="admin-email" name="admin-email" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300">
+                    </div>
+                    <div>
+                        <label for="admin-password" class="block text-gray-700 mb-1">Password</label>
+                        <input type="password" id="admin-password" name="admin-password" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300">
+                    </div>
+                    <div class="pt-2">
+                        <button type="submit" class="btn-primary w-full py-3 rounded-lg font-medium">Login</button>
+                    </div>
+                </form>
+                <div id="login-error" class="mt-4 text-red-500 text-center hidden"></div>
+            </div>
+        </section>
+
+        <!-- Admin Dashboard Page -->
+        <section id="admin-dashboard" class="page">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-gray-800">Admin Dashboard</h2>
+                <button id="admin-logout" class="btn-secondary px-4 py-2 rounded-lg font-medium">Logout</button>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md mb-8">
+                <div class="flex overflow-x-auto">
+                    <div class="admin-tab tab active whitespace-nowrap px-6 py-4" data-tab="services-management">Services</div>
+                    <div class="admin-tab tab whitespace-nowrap px-6 py-4" data-tab="categories-management">Categories</div>
+                    <div class="admin-tab tab whitespace-nowrap px-6 py-4" data-tab="bookings-management">Bookings</div>
+                </div>
+            </div>
+            
+            <!-- Services Management Tab -->
+            <div id="services-management" class="admin-tab-content active">
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Add New Service</h3>
+                    <form id="add-service-form" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="service-name" class="block text-gray-700 mb-1">Service Name</label>
+                                <input type="text" id="service-name" name="service-name" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300">
+                            </div>
+                            <div>
+                                <label for="service-price" class="block text-gray-700 mb-1">Price ($)</label>
+                                <input type="number" id="service-price" name="service-price" min="0" step="0.01" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="service-duration" class="block text-gray-700 mb-1">Duration (minutes)</label>
+                                <input type="number" id="service-duration" name="service-duration" min="5" step="5" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300">
+                            </div>
+                            <div>
+                                <label for="service-category" class="block text-gray-700 mb-1">Category</label>
+                                <select id="service-category" name="service-category" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300">
+                                    <!-- Categories will be loaded here -->
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="service-description" class="block text-gray-700 mb-1">Description</label>
+                            <textarea id="service-description" name="service-description" rows="3" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"></textarea>
+                        </div>
+                        <div class="pt-2">
+                            <button type="submit" class="btn-primary w-full py-2 rounded-lg font-medium">Add Service</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Manage Services</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="services-table-body" class="bg-white divide-y divide-gray-200">
+                                <!-- Services will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Categories Management Tab -->
+            <div id="categories-management" class="admin-tab-content hidden">
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Add New Category</h3>
+                    <form id="add-category-form" class="space-y-4">
+                        <div>
+                            <label for="category-name" class="block text-gray-700 mb-1">Category Name</label>
+                            <input type="text" id="category-name" name="category-name" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300">
+                        </div>
+                        <div>
+                            <label for="category-description" class="block text-gray-700 mb-1">Description (Optional)</label>
+                            <textarea id="category-description" name="category-description" rows="2" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"></textarea>
+                        </div>
+                        <div class="pt-2">
+                            <button type="submit" class="btn-primary w-full py-2 rounded-lg font-medium">Add Category</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Manage Categories</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Services Count</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categories-table-body" class="bg-white divide-y divide-gray-200">
+                                <!-- Categories will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bookings Management Tab -->
+            <div id="bookings-management" class="admin-tab-content hidden">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Manage Bookings</h3>
+                    <div class="flex mb-4 space-x-4">
+                        <select id="booking-filter" class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300">
+                            <option value="all">All Bookings</option>
+                            <option value="pending">Pending</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <input type="date" id="booking-date-filter" class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300">
+                        <button id="clear-booking-filters" class="btn-secondary px-4 py-2 rounded-lg font-medium">Clear Filters</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Services</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bookings-table-body" class="bg-white divide-y divide-gray-200">
+                                <!-- Bookings will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between">
+                <div class="mb-6 md:mb-0">
+                    <h3 class="text-xl font-bold mb-4">NailSK</h3>
+                    <p class="text-gray-300">Your premier destination for nail care and beauty services.</p>
+                </div>
+                <div class="mb-6 md:mb-0">
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="nav-link text-gray-300 hover:text-pink-300" data-page="home">Home</a></li>
+                        <li><a href="#" class="nav-link text-gray-300 hover:text-pink-300" data-page="services">Services</a></li>
+                        <li><a href="#" class="nav-link text-gray-300 hover:text-pink-300" data-page="booking">Book Now</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Contact Us</h4>
+                    <ul class="space-y-2">
+                        <li class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                            <span>(123) 456-7890</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            <span>info@nailsk.com</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span>123 Nail Street, Beauty City</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-6 text-center text-gray-400">
+                <p>&copy; 2023 NailSK. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <!-- Booking Confirmation Modal -->
+    <div id="booking-confirmation-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg p-8 max-w-md w-full mx-4">
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Booking Confirmed!</h3>
+            <div id="booking-confirmation-details" class="mb-6">
+                <!-- Booking details will be loaded here -->
+            </div>
+            <div class="flex justify-end">
+                <button id="close-booking-modal" class="btn-primary px-6 py-2 rounded-lg font-medium">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Service Modal -->
+    <div id="edit-service-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full mx-4">
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Edit Service</h3>
+            <form id="edit-service-form" class="space-y-4">
+                <input type="hidden" id="edit-service-id">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="edit-service-name" class="block text-gray-700 mb-1">Service Name</label>
+                        <input type="text" id="edit-service-name" name="edit-service-name" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300">
+                    </div>
+                    <div>
+                        <label for="edit-service-price" class="block text-gray-700 mb-1">Price ($)</label>
+                        <input type="number" id="edit-service-price" name="edit-service-price" min="0" step="0.01" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="edit-service-duration" class="block text-gray-700 mb-1">Duration (minutes)</label>
+                        <input type="number" id="edit-service-duration" name="edit-service-duration" min="5" step="5" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300">
+                    </div>
+                    <div>
+                        <label for="edit-service-category" class="block text-gray-700 mb-1">Category</label>
+                        <select id="edit-service-category" name="edit-service-category" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300">
+                            <!-- Categories will be loaded here -->
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label for="edit-service-description" class="block text-gray-700 mb-1">Description</label>
+                    <textarea id="edit-service-description" name="edit-service-description" rows="3" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"></textarea>
+                </div>
+                <div class="flex justify-end space-x-4 pt-2">
+                    <button type="button" id="cancel-edit-service" class="btn-secondary px-6 py-2 rounded-lg font-medium">Cancel</button>
+                    <button type="submit" class="btn-primary px-6 py-2 rounded-lg font-medium">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Category Modal -->
+    <div id="edit-category-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg p-8 max-w-md w-full mx-4">
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Edit Category</h3>
+            <form id="edit-category-form" class="space-y-4">
+                <input type="hidden" id="edit-category-id">
+                <div>
+                    <label for="edit-category-name" class="block text-gray-700 mb-1">Category Name</label>
+                    <input type="text" id="edit-category-name" name="edit-category-name" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300">
+                </div>
+                <div>
+                    <label for="edit-category-description" class="block text-gray-700 mb-1">Description (Optional)</label>
+                    <textarea id="edit-category-description" name="edit-category-description" rows="2" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"></textarea>
+                </div>
+                <div class="flex justify-end space-x-4 pt-2">
+                    <button type="button" id="cancel-edit-category" class="btn-secondary px-6 py-2 rounded-lg font-medium">Cancel</button>
+                    <button type="submit" class="btn-primary px-6 py-2 rounded-lg font-medium">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Booking Modal -->
+    <div id="view-booking-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full mx-4">
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Booking Details</h3>
+            <div id="view-booking-details" class="mb-6">
+                <!-- Booking details will be loaded here -->
+            </div>
+            <div class="flex justify-end space-x-4">
+                <button id="close-view-booking" class="btn-secondary px-6 py-2 rounded-lg font-medium">Close</button>
+                <div id="booking-action-buttons">
+                    <!-- Action buttons will be loaded here based on booking status -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-confirmation-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg p-8 max-w-md w-full mx-4">
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Confirm Deletion</h3>
+            <p id="delete-confirmation-message" class="mb-6">Are you sure you want to delete this item?</p>
+            <div class="flex justify-end space-x-4">
+                <button id="cancel-delete" class="btn-secondary px-6 py-2 rounded-lg font-medium">Cancel</button>
+                <button id="confirm-delete" class="btn-danger px-6 py-2 rounded-lg font-medium">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Storage
+        const data = {
+            categories: [
+                { id: 1, name: 'Manicure', description: 'Professional nail care for your hands' },
+                { id: 2, name: 'Pedicure', description: 'Relaxing and rejuvenating foot treatment' },
+                { id: 3, name: 'Nail Art', description: 'Creative and customized nail designs' },
+                { id: 4, name: 'Spa Treatments', description: 'Luxurious spa treatments for hands and feet' }
+            ],
+            services: [
+                { id: 1, name: 'Basic Manicure', categoryId: 1, price: 25.00, duration: 30, description: 'Nail shaping, cuticle care, and polish application' },
+                { id: 2, name: 'Gel Manicure', categoryId: 1, price: 35.00, duration: 45, description: 'Long-lasting gel polish that dries instantly' },
+                { id: 3, name: 'Basic Pedicure', categoryId: 2, price: 35.00, duration: 45, description: 'Foot soak, nail shaping, cuticle care, and polish application' },
+                { id: 4, name: 'Deluxe Pedicure', categoryId: 2, price: 50.00, duration: 60, description: 'Basic pedicure plus exfoliation, mask, and extended massage' },
+                { id: 5, name: 'Simple Nail Art', categoryId: 3, price: 15.00, duration: 20, description: 'Basic designs like dots, lines, or simple patterns' },
+                { id: 6, name: 'Advanced Nail Art', categoryId: 3, price: 30.00, duration: 45, description: 'Complex designs, hand-painted art, or 3D elements' },
+                { id: 7, name: 'Paraffin Treatment', categoryId: 4, price: 20.00, duration: 20, description: 'Warm paraffin wax treatment for soft, moisturized skin' },
+                { id: 8, name: 'Hand Massage', categoryId: 4, price: 15.00, duration: 15, description: 'Relaxing hand massage with premium oils' }
+            ],
+            bookings: [
+                {
+                    id: 1,
+                    date: '2023-06-15',
+                    time: '10:00',
+                    name: 'Jane Smith',
+                    email: 'jane@example.com',
+                    phone: '(555) 123-4567',
+                    services: [1, 5],
+                    total: 40.00,
+                    status: 'completed',
+                    staff: 'Sarah',
+                    notes: ''
+                },
+                {
+                    id: 2,
+                    date: '2023-06-16',
+                    time: '14:00',
+                    name: 'John Doe',
+                    email: 'john@example.com',
+                    phone: '(555) 987-6543',
+                    services: [3, 7],
+                    total: 55.00,
+                    status: 'confirmed',
+                    staff: 'Michael',
+                    notes: 'Allergic to certain fragrances'
+                },
+                {
+                    id: 3,
+                    date: '2023-06-17',
+                    time: '11:00',
+                    name: 'Emily Johnson',
+                    email: 'emily@example.com',
+                    phone: '(555) 456-7890',
+                    services: [2, 6],
+                    total: 65.00,
+                    status: 'pending',
+                    staff: '',
+                    notes: 'First-time customer'
+                }
+            ],
+            selectedServices: [],
+            nextServiceId: 9,
+            nextCategoryId: 5,
+            nextBookingId: 4,
+            adminCredentials: {
+                email: 'admin@nailsk.com',
+                password: 'admin123'
+            }
+        };
+
+        // Utility Functions
+        function formatPrice(price) {
+            return '$' + parseFloat(price).toFixed(2);
+        }
+
+        function calculateTotal(services) {
+            return services.reduce((total, serviceId) => {
+                const service = data.services.find(s => s.id === serviceId);
+                return total + (service ? service.price : 0);
+            }, 0);
+        }
+
+        function getCategoryById(id) {
+            return data.categories.find(category => category.id === id);
+        }
+
+        function getServiceById(id) {
+            return data.services.find(service => service.id === id);
+        }
+
+        function getServicesInCategory(categoryId) {
+            return data.services.filter(service => service.categoryId === categoryId);
+        }
+
+        function countServicesInCategory(categoryId) {
+            return getServicesInCategory(categoryId).length;
+        }
+
+        // Navigation Functions
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            
+            // Update active nav link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.dataset.page === pageId) {
+                    link.classList.add('text-pink-500');
+                } else {
+                    link.classList.remove('text-pink-500');
+                }
+            });
+            
+            // Special page loading logic
+            if (pageId === 'services') {
+                loadServices();
+                updateSelectedServices();
+            } else if (pageId === 'booking') {
+                updateBookingServices();
+            } else if (pageId === 'home') {
+                generateQRCode();
+            }
+        }
+
+        // QR Code Generation
+        function generateQRCode() {
+            const qrcodeContainer = document.getElementById('qrcode');
+            qrcodeContainer.innerHTML = '';
+            
+            new QRCode(qrcodeContainer, {
+                text: window.location.href,
+                width: 128,
+                height: 128,
+                colorDark: '#f472b6',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+
+        // Services Page Functions
+        function loadServices() {
+            const servicesContainer = document.getElementById('services-container');
+            const categoryTabsContainer = document.querySelector('.category-tab').parentElement;
+            
+            // Clear existing tabs except "All Services"
+            const allTab = categoryTabsContainer.querySelector('[data-category="all"]');
+            categoryTabsContainer.innerHTML = '';
+            categoryTabsContainer.appendChild(allTab);
+            
+            // Add category tabs
+            data.categories.forEach(category => {
+                const tab = document.createElement('div');
+                tab.className = 'category-tab tab whitespace-nowrap px-4 py-2';
+                tab.dataset.category = category.id;
+                tab.textContent = category.name;
+                categoryTabsContainer.appendChild(tab);
+            });
+            
+            // Add event listeners to tabs
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    filterServices(tab.dataset.category);
+                });
+            });
+            
+            // Load services
+            filterServices('all');
+        }
+
+        function filterServices(categoryFilter) {
+            const servicesContainer = document.getElementById('services-container');
+            servicesContainer.innerHTML = '';
+            
+            let filteredServices = data.services;
+            if (categoryFilter !== 'all') {
+                filteredServices = data.services.filter(service => service.categoryId === parseInt(categoryFilter));
+            }
+            
+            if (filteredServices.length === 0) {
+                servicesContainer.innerHTML = '<p class="text-gray-500 italic col-span-3 text-center py-8">No services found in this category.</p>';
+                return;
+            }
+            
+            filteredServices.forEach(service => {
+                const category = getCategoryById(service.categoryId);
+                const isSelected = data.selectedServices.includes(service.id);
+                
+                const serviceCard = document.createElement('div');
+                serviceCard.className = 'service-card bg-white rounded-lg shadow-md overflow-hidden transition-all';
+                serviceCard.innerHTML = `
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="text-xl font-semibold text-gray-800">${service.name}</h4>
+                            <span class="text-lg font-bold text-pink-500">${formatPrice(service.price)}</span>
+                        </div>
+                        <p class="text-sm text-gray-500 mb-1">${category.name} • ${service.duration} min</p>
+                        <p class="text-gray-600 mb-4">${service.description}</p>
+                        <button class="service-select-btn w-full py-2 rounded-lg font-medium ${isSelected ? 'bg-pink-100 text-pink-700 border border-pink-300' : 'btn-secondary'}" data-id="${service.id}">
+                            ${isSelected ? 'Selected' : 'Select'}
+                        </button>
+                    </div>
+                `;
+                servicesContainer.appendChild(serviceCard);
+                
+                // Add event listener to select button
+                serviceCard.querySelector('.service-select-btn').addEventListener('click', (e) => {
+                    const serviceId = parseInt(e.target.dataset.id);
+                    toggleServiceSelection(serviceId);
+                });
+            });
+        }
+
+        function toggleServiceSelection(serviceId) {
+            const index = data.selectedServices.indexOf(serviceId);
+            if (index === -1) {
+                data.selectedServices.push(serviceId);
+            } else {
+                data.selectedServices.splice(index, 1);
+            }
+            
+            updateSelectedServices();
+            filterServices(document.querySelector('.category-tab.active').dataset.category);
+        }
+
+        function updateSelectedServices() {
+            const selectedServicesContainer = document.getElementById('selected-services');
+            const totalPriceElement = document.getElementById('total-price');
+            
+            if (data.selectedServices.length === 0) {
+                selectedServicesContainer.innerHTML = '<p class="text-gray-500 italic">No services selected yet.</p>';
+                totalPriceElement.textContent = formatPrice(0);
+                return;
+            }
+            
+            let html = '<ul class="space-y-2">';
+            let total = 0;
+            
+            data.selectedServices.forEach(serviceId => {
+                const service = getServiceById(serviceId);
+                if (service) {
+                    html += `
+                        <li class="flex justify-between">
+                            <span>${service.name}</span>
+                            <div class="flex items-center">
+                                <span class="mr-2">${formatPrice(service.price)}</span>
+                                <button class="remove-service-btn text-red-500 hover:text-red-700" data-id="${service.id}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </li>
+                    `;
+                    total += service.price;
+                }
+            });
+            
+            html += '</ul>';
+            selectedServicesContainer.innerHTML = html;
+            totalPriceElement.textContent = formatPrice(total);
+            
+            // Add event listeners to remove buttons
+            document.querySelectorAll('.remove-service-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const serviceId = parseInt(e.currentTarget.dataset.id);
+                    toggleServiceSelection(serviceId);
+                });
+            });
+        }
+
+        // Booking Page Functions
+        function updateBookingServices() {
+            const bookingServicesContainer = document.getElementById('booking-services');
+            const bookingTotalPriceElement = document.getElementById('booking-total-price');
+            
+            if (data.selectedServices.length === 0) {
+                bookingServicesContainer.innerHTML = '<p class="text-gray-500 italic">No services selected yet. Please select services first.</p>';
+                bookingTotalPriceElement.textContent = formatPrice(0);
+                return;
+            }
+            
+            let html = '<ul class="space-y-2">';
+            let total = 0;
+            let totalDuration = 0;
+            
+            data.selectedServices.forEach(serviceId => {
+                const service = getServiceById(serviceId);
+                if (service) {
+                    html += `
+                        <li class="flex justify-between">
+                            <div>
+                                <span class="font-medium">${service.name}</span>
+                                <span class="text-sm text-gray-500 ml-2">(${service.duration} min)</span>
+                            </div>
+                            <span>${formatPrice(service.price)}</span>
+                        </li>
+                    `;
+                    total += service.price;
+                    totalDuration += service.duration;
+                }
+            });
+            
+            html += `
+                <li class="border-t pt-2 mt-2">
+                    <div class="flex justify-between text-sm text-gray-500">
+                        <span>Estimated Duration:</span>
+                        <span>${totalDuration} minutes</span>
+                    </div>
+                </li>
+            `;
+            
+            html += '</ul>';
+            bookingServicesContainer.innerHTML = html;
+            bookingTotalPriceElement.textContent = formatPrice(total);
+        }
+
+        // Admin Functions
+        function loadAdminDashboard() {
+            loadCategoriesForSelect();
+            loadServicesTable();
+            loadCategoriesTable();
+            loadBookingsTable();
+        }
+
+        function loadCategoriesForSelect() {
+            const categorySelects = [
+                document.getElementById('service-category'),
+                document.getElementById('edit-service-category')
+            ];
+            
+            categorySelects.forEach(select => {
+                if (select) {
+                    select.innerHTML = '';
+                    data.categories.forEach(category => {
+                        const option = document.createElement('option');
+                        option.value = category.id;
+                        option.textContent = category.name;
+                        select.appendChild(option);
+                    });
+                }
+            });
+        }
+
+        function loadServicesTable() {
+            const tableBody = document.getElementById('services-table-body');
+            tableBody.innerHTML = '';
+            
+            if (data.services.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500 italic">No services found.</td></tr>';
+                return;
+            }
+            
+            data.services.forEach(service => {
+                const category = getCategoryById(service.categoryId);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="font-medium text-gray-900">${service.name}</div>
+                        <div class="text-sm text-gray-500">${service.duration} min</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">${category ? category.name : 'Unknown'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap font-medium">${formatPrice(service.price)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${service.duration} min</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button class="edit-service-btn text-indigo-600 hover:text-indigo-900 mr-3" data-id="${service.id}">Edit</button>
+                        <button class="delete-service-btn text-red-600 hover:text-red-900" data-id="${service.id}">Delete</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+                
+                // Add event listeners
+                row.querySelector('.edit-service-btn').addEventListener('click', () => editService(service.id));
+                row.querySelector('.delete-service-btn').addEventListener('click', () => confirmDeleteService(service.id));
+            });
+        }
+
+        function loadCategoriesTable() {
+            const tableBody = document.getElementById('categories-table-body');
+            tableBody.innerHTML = '';
+            
+            if (data.categories.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500 italic">No categories found.</td></tr>';
+                return;
+            }
+            
+            data.categories.forEach(category => {
+                const servicesCount = countServicesInCategory(category.id);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">${category.name}</td>
+                    <td class="px-6 py-4">${category.description || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${servicesCount}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button class="edit-category-btn text-indigo-600 hover:text-indigo-900 mr-3" data-id="${category.id}">Edit</button>
+                        <button class="delete-category-btn text-red-600 hover:text-red-900" data-id="${category.id}" ${servicesCount > 0 ? 'disabled' : ''}>
+                            ${servicesCount > 0 ? 'Cannot Delete' : 'Delete'}
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+                
+                // Add event listeners
+                row.querySelector('.edit-category-btn').addEventListener('click', () => editCategory(category.id));
+                if (servicesCount === 0) {
+                    row.querySelector('.delete-category-btn').addEventListener('click', () => confirmDeleteCategory(category.id));
+                } else {
+                    row.querySelector('.delete-category-btn').classList.add('opacity-50', 'cursor-not-allowed');
+                }
+            });
+        }
+
+        function loadBookingsTable(filter = 'all', dateFilter = '') {
+            const tableBody = document.getElementById('bookings-table-body');
+            tableBody.innerHTML = '';
+            
+            let filteredBookings = [...data.bookings];
+            
+            // Apply status filter
+            if (filter !== 'all') {
+                filteredBookings = filteredBookings.filter(booking => booking.status === filter);
+            }
+            
+            // Apply date filter
+            if (dateFilter) {
+                filteredBookings = filteredBookings.filter(booking => booking.date === dateFilter);
+            }
+            
+            // Sort by date (newest first)
+            filteredBookings.sort((a, b) => {
+                const dateA = new Date(`${a.date} ${a.time}`);
+                const dateB = new Date(`${b.date} ${b.time}`);
+                return dateB - dateA;
+            });
+            
+            if (filteredBookings.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500 italic">No bookings found.</td></tr>';
+                return;
+            }
+            
+            filteredBookings.forEach(booking => {
+                const row = document.createElement('tr');
+                
+                // Format date and time
+                const bookingDate = new Date(`${booking.date} ${booking.time}`);
+                const formattedDate = bookingDate.toLocaleDateString('en-US', { 
+                    weekday: 'short', 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+                const formattedTime = bookingDate.toLocaleTimeString('en-US', { 
+                    hour: 'numeric', 
+                    minute: '2-digit' 
+                });
+                
+                // Get service names
+                const serviceNames = booking.services.map(serviceId => {
+                    const service = getServiceById(serviceId);
+                    return service ? service.name : 'Unknown Service';
+                }).join(', ');
+                
+                // Status badge color
+                let statusClass = '';
+                switch (booking.status) {
+                    case 'pending':
+                        statusClass = 'bg-yellow-100 text-yellow-800';
+                        break;
+                    case 'confirmed':
+                        statusClass = 'bg-blue-100 text-blue-800';
+                        break;
+                    case 'completed':
+                        statusClass = 'bg-green-100 text-green-800';
+                        break;
+                    case 'cancelled':
+                        statusClass = 'bg-red-100 text-red-800';
+                        break;
+                }
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="font-medium text-gray-900">${formattedDate}</div>
+                        <div class="text-sm text-gray-500">${formattedTime}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="font-medium text-gray-900">${booking.name}</div>
+                        <div class="text-sm text-gray-500">${booking.phone}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm text-gray-900 truncate max-w-xs">${serviceNames}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap font-medium">${formatPrice(booking.total)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">
+                            ${booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button class="view-booking-btn text-indigo-600 hover:text-indigo-900" data-id="${booking.id}">View</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+                
+                // Add event listener
+                row.querySelector('.view-booking-btn').addEventListener('click', () => viewBooking(booking.id));
+            });
+        }
+
+        function editService(serviceId) {
+            const service = getServiceById(serviceId);
+            if (!service) return;
+            
+            document.getElementById('edit-service-id').value = service.id;
+            document.getElementById('edit-service-name').value = service.name;
+            document.getElementById('edit-service-price').value = service.price;
+            document.getElementById('edit-service-duration').value = service.duration;
+            document.getElementById('edit-service-category').value = service.categoryId;
+            document.getElementById('edit-service-description').value = service.description;
+            
+            document.getElementById('edit-service-modal').classList.remove('hidden');
+        }
+
+        function editCategory(categoryId) {
+            const category = getCategoryById(categoryId);
+            if (!category) return;
+            
+            document.getElementById('edit-category-id').value = category.id;
+            document.getElementById('edit-category-name').value = category.name;
+            document.getElementById('edit-category-description').value = category.description || '';
+            
+            document.getElementById('edit-category-modal').classList.remove('hidden');
+        }
+
+        function viewBooking(bookingId) {
+            const booking = data.bookings.find(b => b.id === bookingId);
+            if (!booking) return;
+            
+            const detailsContainer = document.getElementById('view-booking-details');
+            const actionButtonsContainer = document.getElementById('booking-action-buttons');
+            
+            // Format date and time
+            const bookingDate = new Date(`${booking.date} ${booking.time}`);
+            const formattedDate = bookingDate.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            const formattedTime = bookingDate.toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit' 
+            });
+            
+            // Get service details
+            const serviceDetails = booking.services.map(serviceId => {
+                const service = getServiceById(serviceId);
+                return service ? `
+                    <div class="flex justify-between mb-1">
+                        <span>${service.name}</span>
+                        <span>${formatPrice(service.price)}</span>
+                    </div>
+                ` : '';
+            }).join('');
+            
+            // Status badge color
+            let statusClass = '';
+            switch (booking.status) {
+                case 'pending':
+                    statusClass = 'bg-yellow-100 text-yellow-800';
+                    break;
+                case 'confirmed':
+                    statusClass = 'bg-blue-100 text-blue-800';
+                    break;
+                case 'completed':
+                    statusClass = 'bg-green-100 text-green-800';
+                    break;
+                case 'cancelled':
+                    statusClass = 'bg-red-100 text-red-800';
+                    break;
+            }
+            
+            detailsContainer.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <h4 class="font-semibold text-gray-700">Customer Information</h4>
+                        <p class="mb-1"><span class="font-medium">Name:</span> ${booking.name}</p>
+                        <p class="mb-1"><span class="font-medium">Email:</span> ${booking.email}</p>
+                        <p><span class="font-medium">Phone:</span> ${booking.phone}</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-700">Appointment Details</h4>
+                        <p class="mb-1"><span class="font-medium">Date:</span> ${formattedDate}</p>
+                        <p class="mb-1"><span class="font-medium">Time:</span> ${formattedTime}</p>
+                        <p><span class="font-medium">Staff:</span> ${booking.staff || 'No preference'}</p>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h4 class="font-semibold text-gray-700 mb-2">Services</h4>
+                    <div class="bg-gray-50 p-3 rounded">
+                        ${serviceDetails}
+                        <div class="border-t mt-2 pt-2 flex justify-between font-medium">
+                            <span>Total</span>
+                            <span>${formatPrice(booking.total)}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h4 class="font-semibold text-gray-700 mb-1">Status</h4>
+                    <span class="px-3 py-1 inline-flex text-sm font-semibold rounded-full ${statusClass}">
+                        ${booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                    </span>
+                </div>
+                
+                ${booking.notes ? `
+                    <div>
+                        <h4 class="font-semibold text-gray-700 mb-1">Notes</h4>
+                        <p class="text-gray-600">${booking.notes}</p>
+                    </div>
+                ` : ''}
+            `;
+            
+            // Add action buttons based on status
+            actionButtonsContainer.innerHTML = '';
+            
+            if (booking.status === 'pending') {
+                actionButtonsContainer.innerHTML = `
+                    <button class="update-booking-status-btn btn-primary px-6 py-2 rounded-lg font-medium mr-2" data-id="${booking.id}" data-status="confirmed">Confirm</button>
+                    <button class="update-booking-status-btn btn-danger px-6 py-2 rounded-lg font-medium" data-id="${booking.id}" data-status="cancelled">Cancel</button>
+                `;
+            } else if (booking.status === 'confirmed') {
+                actionButtonsContainer.innerHTML = `
+                    <button class="update-booking-status-btn btn-primary px-6 py-2 rounded-lg font-medium mr-2" data-id="${booking.id}" data-status="completed">Mark Completed</button>
+                    <button class="update-booking-status-btn btn-danger px-6 py-2 rounded-lg font-medium" data-id="${booking.id}" data-status="cancelled">Cancel</button>
+                `;
+            }
+            
+            // Add event listeners to status buttons
+            document.querySelectorAll('.update-booking-status-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const bookingId = parseInt(e.target.dataset.id);
+                    const newStatus = e.target.dataset.status;
+                    updateBookingStatus(bookingId, newStatus);
+                });
+            });
+            
+            document.getElementById('view-booking-modal').classList.remove('hidden');
+        }
+
+        function confirmDeleteService(serviceId) {
+            const service = getServiceById(serviceId);
+            if (!service) return;
+            
+            document.getElementById('delete-confirmation-message').textContent = `Are you sure you want to delete the service "${service.name}"?`;
+            
+            const confirmDeleteBtn = document.getElementById('confirm-delete');
+            confirmDeleteBtn.dataset.type = 'service';
+            confirmDeleteBtn.dataset.id = serviceId;
+            
+            document.getElementById('delete-confirmation-modal').classList.remove('hidden');
+        }
+
+        function confirmDeleteCategory(categoryId) {
+            const category = getCategoryById(categoryId);
+            if (!category) return;
+            
+            document.getElementById('delete-confirmation-message').textContent = `Are you sure you want to delete the category "${category.name}"?`;
+            
+            const confirmDeleteBtn = document.getElementById('confirm-delete');
+            confirmDeleteBtn.dataset.type = 'category';
+            confirmDeleteBtn.dataset.id = categoryId;
+            
+            document.getElementById('delete-confirmation-modal').classList.remove('hidden');
+        }
+
+        function deleteService(serviceId) {
+            // Remove service from data
+            const serviceIndex = data.services.findIndex(service => service.id === serviceId);
+            if (serviceIndex !== -1) {
+                data.services.splice(serviceIndex, 1);
+            }
+            
+            // Remove service from selected services if present
+            const selectedIndex = data.selectedServices.indexOf(serviceId);
+            if (selectedIndex !== -1) {
+                data.selectedServices.splice(selectedIndex, 1);
+            }
+            
+            // Update UI
+            loadServicesTable();
+            loadServices();
+            updateSelectedServices();
+        }
+
+        function deleteCategory(categoryId) {
+            // Remove category from data
+            const categoryIndex = data.categories.findIndex(category => category.id === categoryId);
+            if (categoryIndex !== -1) {
+                data.categories.splice(categoryIndex, 1);
+            }
+            
+            // Update UI
+            loadCategoriesTable();
+            loadCategoriesForSelect();
+            loadServices();
+        }
+
+        function updateBookingStatus(bookingId, newStatus) {
+            // Update booking status
+            const booking = data.bookings.find(b => b.id === bookingId);
+            if (booking) {
+                booking.status = newStatus;
+            }
+            
+            // Close modal and update table
+            document.getElementById('view-booking-modal').classList.add('hidden');
+            loadBookingsTable(document.getElementById('booking-filter').value, document.getElementById('booking-date-filter').value);
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Navigation
+            document.querySelectorAll('.nav-link').forEach(link => {```
